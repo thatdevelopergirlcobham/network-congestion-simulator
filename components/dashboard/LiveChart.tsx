@@ -13,7 +13,12 @@ export default function LiveChart() {
             <CartesianGrid strokeDasharray="3 3" stroke="#444" />
             <XAxis dataKey="timestamp" stroke="#888" tickFormatter={(ts) => new Date(ts).toLocaleTimeString()} />
             <YAxis stroke="#888" />
-            <Tooltip contentStyle={{ backgroundColor: '#1a1a1a', border: 'none', borderRadius: '4px' }} labelStyle={{ color: '#fff' }} formatter={(value) => value.toFixed(1)} labelFormatter={(ts) => new Date(ts).toLocaleTimeString()} />
+            <Tooltip 
+              contentStyle={{ backgroundColor: '#1a1a1a', border: 'none', borderRadius: '4px' }} 
+              labelStyle={{ color: '#fff' }} 
+              formatter={(value) => typeof value === 'number' ? value.toFixed(1) : value} 
+              labelFormatter={(ts) => new Date(ts).toLocaleTimeString()} 
+            />
             <Legend wrapperStyle={{ color: '#fff' }} />
             <Line type="monotone" dataKey="throughput" stroke="#22c55e" name="Throughput (Mbps)" strokeWidth={2} dot={false} activeDot={{ r: 6 }} />
             <Line type="monotone" dataKey="latency" stroke="#eab308" name="Latency (ms)" strokeWidth={2} dot={false} activeDot={{ r: 6 }} />

@@ -1,7 +1,7 @@
 import { NetworkNode, NetworkUser, CongestionAlgorithm, EventLog } from '@/types';
 
 export const runSimulationStep = (nodes: NetworkNode[], users: NetworkUser[], algorithm: CongestionAlgorithm) => {
-  let totalDemand = users.reduce((sum, user) => sum + user.sendingRate, 0);
+  const totalDemand = users.reduce((sum, user) => sum + user.sendingRate, 0);
   const networkCapacity = 100; // Mock total capacity in Mbps
 
   let congestionFactor = Math.min(1, totalDemand / networkCapacity);
