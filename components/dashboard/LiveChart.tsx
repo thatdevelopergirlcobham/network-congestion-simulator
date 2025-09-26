@@ -1,31 +1,43 @@
 'use client';
-import { useSimulation } from '@/context/SimulationContext';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function LiveChart() {
   const { metricsHistory } = useSimulation();
   return (
-    <div className="bg-card border border-border rounded-lg p-6 h-80 flex flex-col">
-      <h2 className="text-lg font-medium text-foreground mb-4">Network Metrics</h2>
-      <div className="flex-1 overflow-hidden">
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={metricsHistory} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-            <XAxis dataKey="timestamp" stroke="#888" tickFormatter={(ts) => new Date(ts).toLocaleTimeString()} />
-            <YAxis stroke="#888" />
-            <Tooltip 
-              contentStyle={{ backgroundColor: '#1a1a1a', border: 'none', borderRadius: '4px' }} 
-              labelStyle={{ color: '#fff' }} 
-              formatter={(value) => typeof value === 'number' ? value.toFixed(1) : value} 
-              labelFormatter={(ts) => new Date(ts).toLocaleTimeString()} 
-            />
-            <Legend wrapperStyle={{ color: '#fff' }} />
-            <Line type="monotone" dataKey="throughput" stroke="#22c55e" name="Throughput (Mbps)" strokeWidth={2} dot={false} activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="latency" stroke="#eab308" name="Latency (ms)" strokeWidth={2} dot={false} activeDot={{ r: 6 }} />
-            <Line type="monotone" dataKey="packetLoss" stroke="#ef4444" name="Packet Loss (%)" strokeWidth={2} dot={false} activeDot={{ r: 6 }} />
-          </LineChart>
+    <Card>
+      <CardHeader>
+        <CardTitle>Real-time Network Metrics</CardTitle>
+        <CardDescription>Live data of network performance</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={300}>
+          <AreaChart data={metricsHistory}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorThroughput" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="colorLatency" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#eab308" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#eab308" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="colorPacketLoss" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="timestamp" tickFormatter={(ts) => new Date(ts).toLocaleTimeString()} />
+            <YAxis />
+            <CartesianGrid strokeDasharray="3 3" />
+            <Tooltip />
+            <Area type="monotone" dataKey="throughput" stroke="#22c55e" fillOpacity={1} fill="url(#colorThroughput)" />
+            <Area type="monotone" dataKey="latency" stroke="#eab308" fillOpacity={1} fill="url(#colorLatency)" />
+            <Area type="monotone" dataKey="packetLoss" stroke="#ef4444" fillOpacity={1} fill="url(#colorPacketLoss)" />
+          </AreaChart>
         </ResponsiveContainer>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

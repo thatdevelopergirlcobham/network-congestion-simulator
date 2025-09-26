@@ -9,8 +9,8 @@ export interface NetworkNode {
 export interface NetworkUser {
   id: string;
   name: string;
-  trafficType: 'Video Stream' | 'File Download' | 'VoIP Call';
-  sendingRate: number; // in Mbps
+  trafficType: "Video Stream" | "File Download" | "VoIP Call";
+  sendingRate: number;
 }
 
 export interface NetworkMetrics {

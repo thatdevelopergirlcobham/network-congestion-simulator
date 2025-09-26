@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { SimulationProvider } from "@/context/SimulationContext";
+import { AuthProvider } from "@/context/AuthContext";
 import Header from "@/components/layout/Header";
 
 const poppins = Poppins({
@@ -22,12 +23,14 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${poppins.className} antialiased bg-gradient-to-br from-[#0a192f] to-background`}>
-        <SimulationProvider>
-          <div className="flex flex-col min-h-screen">
-            <Header />
-            {children}
-          </div>
-        </SimulationProvider>
+        <AuthProvider>
+          <SimulationProvider>
+            <div className="flex flex-col min-h-screen">
+              <Header />
+              {children}
+            </div>
+          </SimulationProvider>
+        </AuthProvider>
       </body>
     </html>
   );
