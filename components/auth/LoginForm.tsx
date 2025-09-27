@@ -35,6 +35,9 @@ export default function LoginForm() {
         <CardTitle className="text-2xl">Admin Login</CardTitle>
         <CardDescription>
           Enter your email below to login to your account.
+          <p className="text-sm text-muted-foreground">
+            (use admin@example.com and password)
+          </p>
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>

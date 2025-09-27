@@ -16,13 +16,13 @@ export default function EventLog() {
     <div className="bg-card border border-border rounded-lg p-4 flex flex-col h-[calc(50%-0.75rem)]">
       <h2 className="text-lg font-medium text-foreground mb-3">Event Log</h2>
       <div className="flex-1 overflow-auto space-y-2 pr-1">
-        {eventLog.length === 0 && <p className="text-sm text-muted-foreground italic">No events yet. Start the simulation to see activity.</p>}
+        {eventLog.length === 0 && <div className="text-sm text-muted-foreground italic">No events yet. Start the simulation to see activity.</div>}
         {eventLog.map((event, idx) => (
           <div key={idx} className="flex items-start gap-2 py-1 border-b border-border/30 last:border-0">
             <div className="mt-0.5">{getEventIcon(event.type)}</div>
             <div>
-              <p className="text-xs text-muted-foreground">{event.timestamp}</p>
-              <p className="text-sm text-foreground">{event.message}</p>
+              <div className="text-xs text-muted-foreground">{event.timestamp}</div>
+              <div className="text-sm text-foreground">{event.message}</div>
             </div>
           </div>
         ))}
