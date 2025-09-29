@@ -51,6 +51,12 @@ export default function LiveChart() {
     );
   }
 
+  // Prepare chart data with proper timestamps
+  const chartData = metricsHistory.map(metric => ({
+    ...metric,
+    timestamp: new Date(metric.timestamp).getTime()
+  }));
+
   return (
     <Card>
       <CardHeader>
@@ -60,16 +66,17 @@ export default function LiveChart() {
         </div>
       </CardHeader>
       <CardContent className="min-h-[300px]">
-        {!metricsHistory || metricsHistory.length === 0 ? (
+        {!isRunning && metricsHistory.length === 0 ? (
           <div className="flex items-center justify-center h-64 text-muted-foreground">
-            {isRunning ? 'Collecting data...' : 'Start the simulation to see metrics'}
+            Start the simulation to see metrics
           </div>
         ) : (
           <div className="w-full h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={metricsHistory}
+                data={chartData}
                 margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                key={chartData.length} // Force re-render when data changes
               >
                 <defs>
                   <linearGradient id="colorThroughput" x1="0" y1="0" x2="0" y2="1">
@@ -90,44 +97,51 @@ export default function LiveChart() {
                   tickFormatter={formatTime}
                   tick={{ fontSize: 12 }}
                 />
-                <YAxis />
+                <YAxis yAxisId="left" orientation="left" />
+                <YAxis yAxisId="right" orientation="right" />
                 <CartesianGrid strokeDasharray="3 3" />
                 <Tooltip 
                   formatter={formatTooltip}
                   labelFormatter={formatTime}
                 />
                 <Area
+                  yAxisId="left"
                   type="monotone"
                   dataKey="throughput"
                   name="Throughput"
                   stroke="#22c55e"
-                  fillOpacity={1}
+                  fillOpacity={0.2}
                   fill="url(#colorThroughput)"
-                  unit=" Mbps"
                   isAnimationActive={true}
                   animationDuration={500}
+                  dot={false}
+                  activeDot={{ r: 4 }}
                 />
                 <Area
+                  yAxisId="left"
                   type="monotone"
                   dataKey="latency"
                   name="Latency"
                   stroke="#eab308"
-                  fillOpacity={1}
+                  fillOpacity={0.2}
                   fill="url(#colorLatency)"
-                  unit=" ms"
                   isAnimationActive={true}
                   animationDuration={500}
+                  dot={false}
+                  activeDot={{ r: 4 }}
                 />
                 <Area
+                  yAxisId="right"
                   type="monotone"
                   dataKey="packetLoss"
                   name="Packet Loss"
                   stroke="#ef4444"
-                  fillOpacity={1}
+                  fillOpacity={0.2}
                   fill="url(#colorPacketLoss)"
-                  unit="%"
                   isAnimationActive={true}
                   animationDuration={500}
+                  dot={false}
+                  activeDot={{ r: 4 }}
                 />
               </AreaChart>
             </ResponsiveContainer>

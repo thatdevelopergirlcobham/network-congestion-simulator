@@ -146,22 +146,33 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
     setUsers(prev => {
       const userToRemove = prev.find(u => u.id === userId);
       if (userToRemove) {
+        const updatedUsers = prev.filter(u => u.id !== userId);
+        // Update localStorage when user is removed
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedUsers));
+        } catch (error) {
+          console.error('Failed to update users in localStorage', error);
+        }
         addEvent({ 
           timestamp: new Date().toLocaleTimeString(), 
           message: `User '${userToRemove.name}' removed.`,
           type: 'info' 
         });
-        return prev.filter(u => u.id !== userId);
+        return updatedUsers;
       }
       return prev;
     });
   }, [addEvent]);
   
+  // Generate initial metrics when simulation starts
   useEffect(() => {
     if (isRunning) {
-      // Clear any existing interval to prevent multiple intervals
-      if (simulationInterval.current) {
-        clearInterval(simulationInterval.current);
+      // Generate initial metrics
+      const initialMetrics = runSimulationStep(nodes, users);
+      setNodes(initialMetrics.newNodes);
+      setMetricsHistory(prev => [...prev, initialMetrics.newMetrics].slice(-30));
+      if (initialMetrics.newEvent) {
+        addEvent(initialMetrics.newEvent);
       }
 
       // Set up the simulation interval
@@ -196,7 +207,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
         simulationInterval.current = null;
       }
     };
-  }, [isRunning, users, activeAlgorithm, addEvent]);
+  }, [isRunning, users, activeAlgorithm, addEvent, nodes]);
 
   const value = { 
     isRunning, 
