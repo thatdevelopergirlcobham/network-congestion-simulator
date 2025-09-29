@@ -27,7 +27,7 @@ const TRAFFIC_TYPES = [
   { value: "VoIP Call", label: "VoIP Call" },
 ] as const;
 
-export default function AddUserModal({ onAddUser }: { onAddUser: () => void }) {
+export default function AddUserModal() {
   const [name, setName] = useState("");
   const [trafficType, setTrafficType] = useState("");
   const [sendingRate, setSendingRate] = useState("");
@@ -56,9 +56,8 @@ export default function AddUserModal({ onAddUser }: { onAddUser: () => void }) {
     setTrafficType('');
     setSendingRate('');
     
-    // Close dialog and notify parent
+    // Close dialog
     setIsOpen(false);
-    onAddUser();
   };
 
   return (

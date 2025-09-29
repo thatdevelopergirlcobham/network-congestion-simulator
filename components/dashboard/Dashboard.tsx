@@ -4,9 +4,10 @@ import EventLog from "@/components/dashboard/EventLog";
 import LiveChart from "@/components/dashboard/LiveChart";
 import NetworkTopology from "@/components/dashboard/NetworkTopology";
 import UserTable from "@/components/dashboard/UserTable";
+import AddUserModal from "@/components/dashboard/AddUserModal";
 import { NetworkUser } from "@/types";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Plus } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { useSimulation, SimulationProvider } from "@/context/SimulationContext";
 
 function DashboardContent() {
@@ -18,7 +19,8 @@ function DashboardContent() {
     users,
     nodes, // eslint-disable-line @typescript-eslint/no-unused-vars
     metricsHistory, // eslint-disable-line @typescript-eslint/no-unused-vars
-    eventLog // eslint-disable-line @typescript-eslint/no-unused-vars
+    eventLog, // eslint-disable-line @typescript-eslint/no-unused-vars
+    removeUser: contextRemoveUser
   } = useSimulation();
 
   // Load users from localStorage on component mount (for compatibility)
@@ -34,32 +36,18 @@ function DashboardContent() {
     }
   }, []);
 
-  // Function to refresh users from localStorage
-  const refreshUsers = useCallback(() => {
-    const savedUsers = localStorage.getItem("networkUsers");
-    if (savedUsers) {
-      try {
-        JSON.parse(savedUsers) as NetworkUser[];
-        // Users are managed by SimulationContext, no need to use parsed data
-      } catch (error) {
-        console.error("Error parsing users from localStorage:", error);
-      }
-    }
-  }, []);
-
   // Handle user updates
-  const handleUserUpdate = useCallback((_updatedUser: NetworkUser) => {
+  const handleUserUpdate = useCallback((updatedUser: NetworkUser) => {
     // Users are managed by SimulationContext
-    void _updatedUser; // Parameter kept for UserTable compatibility
+    // For now, show success message - in a real app you'd update the user in the backend
+    void updatedUser; // Parameter used for UserTable compatibility
     alert("User updated successfully");
   }, []);
 
   // Handle user deletion
-  const handleUserDelete = useCallback((_userId: string) => {
-    // Users are managed by SimulationContext
-    void _userId; // Parameter kept for UserTable compatibility
-    // This is just for compatibility with UserTable component
-  }, []);
+  const handleUserDelete = useCallback((userId: string) => {
+    contextRemoveUser(userId);
+  }, [contextRemoveUser]);
 
   // Toggle simulation
   const toggleSimulation = useCallback(() => {
@@ -101,9 +89,7 @@ function DashboardContent() {
             <RotateCcw className="h-4 w-4" />
             Reset
           </Button>
-          <Button onClick={refreshUsers} variant="outline" size="icon">
-            <Plus className="h-4 w-4" />
-          </Button>
+          <AddUserModal />
         </div>
       </div>
 
