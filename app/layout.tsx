@@ -3,6 +3,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import { SimulationProvider } from "@/context/SimulationContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/layout/Header";
 
 const poppins = Poppins({
@@ -21,16 +22,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${poppins.className} antialiased bg-gradient-to-br from-[#0a192f] to-background`}>
-        <AuthProvider>
-          <SimulationProvider>
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              {children}
-            </div>
-          </SimulationProvider>
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${poppins.className} antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <SimulationProvider>
+              <div className="flex flex-col min-h-screen bg-background">
+                <Header />
+                <main className="flex-1">
+                  {children}
+                </main>
+              </div>
+            </SimulationProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
