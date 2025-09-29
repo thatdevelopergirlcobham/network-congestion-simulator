@@ -61,16 +61,11 @@ export function runSimulationStep(
   
   // Create metrics for this step
   const newMetrics: NetworkMetrics = {
-    timestamp: new Date().toISOString(),
+    timestamp: Date.now(),
     latency: Math.round(latency * 10) / 10,
     packetLoss: Math.round(packetLoss * 100) / 100,
-    throughput: Math.max(5, throughput), // Ensure minimum 5% throughput
-    users: users.length,
-    congestionLevel: Math.round(congestionLevel * 100) / 100
+    throughput: Math.max(5, throughput) // Ensure minimum 5% throughput
   };
-  
-  // Track metrics for trend analysis
-  previousMetrics = newMetrics;
   
   // Generate events for significant changes
   let newEvent: EventLog | undefined;

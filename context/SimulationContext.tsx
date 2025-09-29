@@ -169,8 +169,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
         setNodes(currentNodes => {
           const { newNodes, newMetrics, newEvent } = runSimulationStep(
             currentNodes, 
-            users, 
-            activeAlgorithm
+            users
           );
           
           // Update metrics history with the new metrics
