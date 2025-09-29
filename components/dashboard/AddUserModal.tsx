@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
+import { useSimulation } from "@/context/SimulationContext";
 import { NetworkUser } from "@/types";
 
 const TRAFFIC_TYPES = [
@@ -27,40 +27,46 @@ const TRAFFIC_TYPES = [
   { value: "VoIP Call", label: "VoIP Call" },
 ] as const;
 
-export default function AddUserModal() {
+const DEFAULT_RATES = {
+  'Video Stream': 10,
+  'File Download': 30,
+  'VoIP Call': 5,
+};
+
+interface AddUserModalProps {
+  onAddUser?: () => void;
+}
+
+export default function AddUserModal({ onAddUser }: AddUserModalProps) {
+  const { addUser } = useSimulation();
   const [name, setName] = useState("");
-  const [trafficType, setTrafficType] = useState("");
-  const [sendingRate, setSendingRate] = useState("");
+  const [trafficType, setTrafficType] = useState<NetworkUser['trafficType'] | ''>('');
   const [isOpen, setIsOpen] = useState(false);
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const newUser: Omit<NetworkUser, 'id'> = {
+    if (!name || !trafficType) return;
+    
+    addUser({
       name,
       trafficType: trafficType as NetworkUser['trafficType'],
-      sendingRate: parseFloat(sendingRate) || 0,
-    };
-
-    // Get existing users from localStorage
-    const existingUsers = localStorage.getItem('networkUsers');
-    const users = existingUsers ? JSON.parse(existingUsers) : [];
-    
-    // Add new user
-    const updatedUsers = [...users, newUser];
-    
-    // Save to localStorage
-    localStorage.setItem('networkUsers', JSON.stringify(updatedUsers));
+      sendingRate: trafficType ? DEFAULT_RATES[trafficType] : 10,
+    });
     
     // Reset form
     setName('');
     setTrafficType('');
-    setSendingRate('');
-    
-    // Close dialog
     setIsOpen(false);
     
-    // Force page refresh to show new user
-    window.location.reload();
+    // Call the onAddUser callback if provided
+    if (onAddUser) {
+      onAddUser();
+    }
+  };
+  
+  const handleTrafficTypeChange = (value: string) => {
+    setTrafficType(value as NetworkUser['trafficType']);
   };
 
   return (
@@ -93,7 +99,7 @@ export default function AddUserModal() {
               <Label htmlFor="trafficType" className="text-right">
                 Traffic Type
               </Label>
-              <Select value={trafficType} onValueChange={setTrafficType}>
+              <Select value={trafficType} onValueChange={handleTrafficTypeChange} required>
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select traffic type" />
                 </SelectTrigger>
@@ -113,12 +119,11 @@ export default function AddUserModal() {
               <Input
                 id="sendingRate"
                 type="number"
-                min="0"
-                step="0.1"
-                value={sendingRate}
-                onChange={(e) => setSendingRate(e.target.value)}
-                className="col-span-3"
-                required
+                min="1"
+                max="100"
+                value={trafficType ? String(DEFAULT_RATES[trafficType as keyof typeof DEFAULT_RATES]) : ''}
+                readOnly
+                className="col-span-3 bg-muted/50"
               />
             </div>
           </div>

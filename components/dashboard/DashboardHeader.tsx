@@ -1,15 +1,12 @@
 import { Play, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import AddUserModal from "./AddUserModal";
 
 type DashboardHeaderProps = {
-  onAddUser: () => void;
   onSimulationToggle: () => void;
   isSimulationRunning: boolean;
 };
 
 export default function DashboardHeader({ 
-  onAddUser, 
   onSimulationToggle, 
   isSimulationRunning 
 }: DashboardHeaderProps) {
@@ -34,7 +31,6 @@ export default function DashboardHeader({
             </>
           )}
         </Button>
-        <AddUserModal onAddUser={onAddUser} />
       </div>
     </div>
   );

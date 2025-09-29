@@ -1,9 +1,10 @@
 'use client';
 import { useSimulation } from '@/context/SimulationContext';
-import { UserPlus, Trash2, Wifi, Download, Phone } from 'lucide-react';
+import { Trash2, Wifi, Download, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react';
+import AddUserModal from './AddUserModal';
 
 type TrafficType = 'Video Stream' | 'File Download' | 'VoIP Call';
 
@@ -23,39 +24,22 @@ const getTrafficColor = (type: TrafficType) => {
 };
 
 export default function UserList() {
-  const { users, addUser, removeUser } = useSimulation();
+  const { users, removeUser } = useSimulation();
   const [isClient, setIsClient] = useState(false);
-  const trafficTypes = ['Video Stream', 'File Download', 'VoIP Call'] as const;
   
   // Set isClient to true after mount to avoid hydration issues
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-  const getRandomType = (): TrafficType => 
-    trafficTypes[Math.floor(Math.random() * trafficTypes.length)] as TrafficType;
-  
-  const getRateForType = (type: TrafficType): number => {
-    switch(type) {
-      case 'Video Stream': return Math.floor(Math.random() * 15) + 10;
-      case 'File Download': return Math.floor(Math.random() * 25) + 20;
-      case 'VoIP Call': return Math.floor(Math.random() * 5) + 2;
-    }
-  };
-
-  const handleAddUser = () => {
-    const type = getRandomType();
-    addUser({
-      name: `User ${String.fromCharCode(65 + users.length)}`,
-      trafficType: type,
-      sendingRate: getRateForType(type)
-    });
-  };
-
   const handleRemoveUser = (userId: string, userName: string) => {
     if (confirm(`Are you sure you want to remove ${userName}?`)) {
       removeUser(userId);
     }
+  };
+  
+  const handleUserAdded = () => {
+    // User was added, no need to manage modal state here anymore
   };
 
   // Don't render on server to avoid hydration issues
@@ -85,15 +69,7 @@ export default function UserList() {
             {users.length}
           </Badge>
         </div>
-        <Button 
-          onClick={handleAddUser} 
-          size="sm" 
-          variant="outline"
-          className="gap-1"
-        >
-          <UserPlus className="h-4 w-4" />
-          <span>Add User</span>
-        </Button>
+        <AddUserModal onAddUser={handleUserAdded} />
       </div>
       
       <div className="flex-1 overflow-y-auto pr-1">
