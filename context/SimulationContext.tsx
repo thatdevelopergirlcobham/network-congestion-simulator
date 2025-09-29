@@ -164,11 +164,18 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
     });
   }, [addEvent]);
   
+  const nodesRef = useRef(nodes);
+
+  // Keep the ref updated with current nodes
+  useEffect(() => {
+    nodesRef.current = nodes;
+  }, [nodes]);
+
   // Generate initial metrics when simulation starts
   useEffect(() => {
     if (isRunning) {
-      // Generate initial metrics
-      const initialMetrics = runSimulationStep(nodes, users);
+      // Generate initial metrics using ref to avoid dependency issues
+      const initialMetrics = runSimulationStep(nodesRef.current, users);
       setNodes(initialMetrics.newNodes);
       setMetricsHistory(prev => [...prev, initialMetrics.newMetrics].slice(-30));
       if (initialMetrics.newEvent) {

@@ -58,6 +58,9 @@ export default function AddUserModal() {
     
     // Close dialog
     setIsOpen(false);
+    
+    // Force page refresh to show new user
+    window.location.reload();
   };
 
   return (

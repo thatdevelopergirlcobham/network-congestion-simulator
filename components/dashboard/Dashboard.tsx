@@ -19,8 +19,7 @@ function DashboardContent() {
     users,
     nodes, // eslint-disable-line @typescript-eslint/no-unused-vars
     metricsHistory, // eslint-disable-line @typescript-eslint/no-unused-vars
-    eventLog, // eslint-disable-line @typescript-eslint/no-unused-vars
-    removeUser: contextRemoveUser
+    eventLog // eslint-disable-line @typescript-eslint/no-unused-vars
   } = useSimulation();
 
   // Load users from localStorage on component mount (for compatibility)
@@ -36,18 +35,49 @@ function DashboardContent() {
     }
   }, []);
 
-  // Handle user updates
+  // Handle user updates - update in localStorage
   const handleUserUpdate = useCallback((updatedUser: NetworkUser) => {
-    // Users are managed by SimulationContext
-    // For now, show success message - in a real app you'd update the user in the backend
-    void updatedUser; // Parameter used for UserTable compatibility
-    alert("User updated successfully");
+    // Get existing users from localStorage
+    const savedUsers = localStorage.getItem("networkUsers");
+    if (savedUsers) {
+      try {
+        const users = JSON.parse(savedUsers) as NetworkUser[];
+        // Update the user
+        const updatedUsers = users.map(user =>
+          user.id === updatedUser.id ? updatedUser : user
+        );
+        // Save back to localStorage
+        localStorage.setItem("networkUsers", JSON.stringify(updatedUsers));
+        alert("User updated successfully");
+        // Force page refresh to show updated user data
+        window.location.reload();
+      } catch (error) {
+        console.error("Error updating user in localStorage:", error);
+        alert("Error updating user");
+      }
+    }
   }, []);
 
-  // Handle user deletion
+  // Handle user deletion - remove from localStorage
   const handleUserDelete = useCallback((userId: string) => {
-    contextRemoveUser(userId);
-  }, [contextRemoveUser]);
+    // Get existing users from localStorage
+    const savedUsers = localStorage.getItem("networkUsers");
+    if (savedUsers) {
+      try {
+        const users = JSON.parse(savedUsers) as NetworkUser[];
+        // Remove the user
+        const filteredUsers = users.filter(user => user.id !== userId);
+        // Save back to localStorage
+        localStorage.setItem("networkUsers", JSON.stringify(filteredUsers));
+        alert("User deleted successfully");
+        // Force page refresh to show updated user list
+        window.location.reload();
+      } catch (error) {
+        console.error("Error deleting user from localStorage:", error);
+        alert("Error deleting user");
+      }
+    }
+  }, []);
 
   // Toggle simulation
   const toggleSimulation = useCallback(() => {
