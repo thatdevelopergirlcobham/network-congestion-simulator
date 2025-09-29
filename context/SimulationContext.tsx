@@ -179,27 +179,27 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
       simulationInterval.current = setInterval(() => {
         setNodes(currentNodes => {
           const { newNodes, newMetrics, newEvent } = runSimulationStep(
-            currentNodes, 
+            currentNodes,
             users
           );
-          
+
           // Update metrics history with the new metrics
           setMetricsHistory(prev => {
             const newHistory = [...prev, newMetrics];
             // Keep only the last 30 data points
             return newHistory.slice(-30);
           });
-          
+
           // Add event if there is one
           if (newEvent) {
             addEvent(newEvent);
           }
-          
+
           return newNodes;
         });
       }, 1000);
     }
-    
+
     // Cleanup function to clear the interval when the component unmounts or dependencies change
     return () => {
       if (simulationInterval.current) {
@@ -207,7 +207,7 @@ export function SimulationProvider({ children }: { children: ReactNode }) {
         simulationInterval.current = null;
       }
     };
-  }, [isRunning, users, activeAlgorithm, addEvent, nodes]);
+  }, [isRunning, users, activeAlgorithm, addEvent]);
 
   const value = { 
     isRunning, 

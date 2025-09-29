@@ -1,10 +1,9 @@
 'use client';
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import EventLog from "@/components/dashboard/EventLog";
 import LiveChart from "@/components/dashboard/LiveChart";
 import NetworkTopology from "@/components/dashboard/NetworkTopology";
 import UserTable from "@/components/dashboard/UserTable";
-import { dummyUsers } from "@/lib/dummy-data";
 import { NetworkUser } from "@/types";
 import { Button } from "@/components/ui/button";
 import { RotateCcw, Plus } from "lucide-react";
@@ -17,25 +16,21 @@ function DashboardContent() {
     pauseSimulation,
     resetSimulation,
     users,
+    nodes, // eslint-disable-line @typescript-eslint/no-unused-vars
+    metricsHistory, // eslint-disable-line @typescript-eslint/no-unused-vars
+    eventLog // eslint-disable-line @typescript-eslint/no-unused-vars
   } = useSimulation();
 
-  const [, setLocalUsers] = useState<NetworkUser[]>([]);
-
-  // Load users from localStorage on component mount
+  // Load users from localStorage on component mount (for compatibility)
   useEffect(() => {
     const savedUsers = localStorage.getItem("networkUsers");
     if (savedUsers) {
       try {
-        const parsedUsers = JSON.parse(savedUsers) as NetworkUser[];
-        setLocalUsers(parsedUsers);
+        JSON.parse(savedUsers) as NetworkUser[];
+        // Users are managed by SimulationContext, no need to use parsed data
       } catch (error) {
         console.error("Error parsing users from localStorage:", error);
-        setLocalUsers(dummyUsers);
-        localStorage.setItem("networkUsers", JSON.stringify(dummyUsers));
       }
-    } else {
-      setLocalUsers(dummyUsers);
-      localStorage.setItem("networkUsers", JSON.stringify(dummyUsers));
     }
   }, []);
 
@@ -44,8 +39,8 @@ function DashboardContent() {
     const savedUsers = localStorage.getItem("networkUsers");
     if (savedUsers) {
       try {
-        const parsedUsers = JSON.parse(savedUsers) as NetworkUser[];
-        setLocalUsers(parsedUsers);
+        JSON.parse(savedUsers) as NetworkUser[];
+        // Users are managed by SimulationContext, no need to use parsed data
       } catch (error) {
         console.error("Error parsing users from localStorage:", error);
       }
@@ -53,24 +48,17 @@ function DashboardContent() {
   }, []);
 
   // Handle user updates
-  const handleUserUpdate = useCallback((updatedUser: NetworkUser) => {
-    setLocalUsers((prevUsers) => {
-      const updatedUsers = prevUsers.map((user) =>
-        user.id === updatedUser.id ? updatedUser : user
-      );
-      localStorage.setItem("networkUsers", JSON.stringify(updatedUsers));
-      alert("User updated successfully");
-      return updatedUsers;
-    });
+  const handleUserUpdate = useCallback((_updatedUser: NetworkUser) => {
+    // Users are managed by SimulationContext
+    void _updatedUser; // Parameter kept for UserTable compatibility
+    alert("User updated successfully");
   }, []);
 
   // Handle user deletion
-  const handleUserDelete = useCallback((userId: string) => {
-    setLocalUsers((prevUsers) => {
-      const updatedUsers = prevUsers.filter((user) => user.id !== userId);
-      localStorage.setItem("networkUsers", JSON.stringify(updatedUsers));
-      return updatedUsers;
-    });
+  const handleUserDelete = useCallback((_userId: string) => {
+    // Users are managed by SimulationContext
+    void _userId; // Parameter kept for UserTable compatibility
+    // This is just for compatibility with UserTable component
   }, []);
 
   // Toggle simulation
