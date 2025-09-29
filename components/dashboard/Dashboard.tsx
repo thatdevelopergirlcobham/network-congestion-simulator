@@ -1,19 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
-import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import EventLog from "@/components/dashboard/EventLog";
 import LiveChart from "@/components/dashboard/LiveChart";
 import NetworkTopology from "@/components/dashboard/NetworkTopology";
 import UserTable from "@/components/dashboard/UserTable";
 import { dummyUsers } from "@/lib/dummy-data";
-import { NetworkUser, NetworkMetrics } from "@/types";
+import { NetworkUser, NetworkMetrics, EventLog as EventLogType } from "@/types";
 import { Button } from "@/components/ui/button";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Plus } from "lucide-react";
 
 export default function Dashboard() {
   const [users, setUsers] = useState<NetworkUser[]>([]);
   const [isSimulationRunning, setIsSimulationRunning] = useState(false);
-  const [metrics, setMetrics] = useState<NetworkMetrics[]>([]);
-  const [events, setEvents] = useState<{timestamp: string; message: string; type: 'info' | 'warning' | 'success'}>([]);
+  const [, setMetrics] = useState<NetworkMetrics[]>([]);
+  const [, setEvents] = useState<EventLogType[]>([]);
 
   // Load users from localStorage on component mount
   useEffect(() => {
@@ -55,7 +54,7 @@ export default function Dashboard() {
         user.id === updatedUser.id ? updatedUser : user
       );
       localStorage.setItem('networkUsers', JSON.stringify(updatedUsers));
-      toast.success('User updated successfully');
+      alert('User updated successfully');
       return updatedUsers;
     });
   }, []);
@@ -65,7 +64,7 @@ export default function Dashboard() {
     setUsers(prevUsers => {
       const updatedUsers = prevUsers.filter(user => user.id !== userId);
       localStorage.setItem('networkUsers', JSON.stringify(updatedUsers));
-      toast.success('User deleted successfully');
+      return updatedUsers;
     });
   }, []);
 
@@ -78,12 +77,11 @@ export default function Dashboard() {
   const resetSimulation = useCallback(() => {
     setIsSimulationRunning(false);
     setMetrics([]);
-    setEvents({});
+    setEvents([]);
     // Reset users to initial state
     setUsers(dummyUsers);
     localStorage.setItem('networkUsers', JSON.stringify(dummyUsers));
   }, []);
-
   // Run simulation effect
   useEffect(() => {
     if (!isSimulationRunning) return;
@@ -91,7 +89,6 @@ export default function Dashboard() {
     const interval = setInterval(() => {
       // Generate more realistic network metrics based on user count
       const baseThroughput = 20 + (Math.random() * 80); // 20-100 Mbps base
-      const userFactor = users.length * (1 + Math.random() * 0.5); // More users = more variation
       const currentTime = Date.now();
       
       // Simulate network patterns (e.g., periodic congestion)
@@ -101,8 +98,7 @@ export default function Dashboard() {
         timestamp: currentTime,
         throughput: Math.max(5, baseThroughput * (0.8 + timeFactor * 0.4)), // 80-120% of base
         packetLoss: Math.min(5, users.length * 0.1 * (0.5 + Math.random())), // 0-5%, increases with users
-        latency: 10 + (users.length * 2) + (Math.random() * 30 * timeFactor), // 10-60ms + user factor
-        users: users.length
+        latency: 10 + (users.length * 2) + (Math.random() * 30 * timeFactor) // 10-60ms + user factor
       };
 
       setMetrics(prev => {
@@ -139,14 +135,14 @@ export default function Dashboard() {
           type = 'info';
         }
         
-        setEvents(prev => ({
-          ...prev,
-          [currentTime]: {
-            timestamp: new Date(currentTime).toISOString(),
+        setEvents(prev => [
+          {
+            timestamp: new Date(currentTime).toLocaleTimeString(),
             message,
             type
-          }
-        }));
+          },
+          ...prev
+        ].slice(0, 50)); // Keep only the 50 most recent events
       }
     }, 1000);
 
@@ -191,8 +187,8 @@ export default function Dashboard() {
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
         <div className="lg:col-span-2 space-y-4 md:space-y-6 lg:space-y-8">
-          <NetworkTopology users={users} isSimulationRunning={isSimulationRunning} />
-          <LiveChart data={metrics} isSimulationRunning={isSimulationRunning} />
+          <NetworkTopology />
+          <LiveChart />
         </div>
         <div className="lg:col-span-1 space-y-4 md:space-y-6 lg:space-y-8">
           <UserTable 
@@ -200,7 +196,7 @@ export default function Dashboard() {
             onUserUpdate={handleUserUpdate}
             onUserDelete={handleUserDelete}
           />
-          <EventLog events={Object.values(events)} />
+          <EventLog />
         </div>
       </div>
       
